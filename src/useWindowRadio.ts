@@ -47,7 +47,7 @@ export function useFrameRadio<O>(
 ): [Ref<HTMLIFrameElement>, PostMessage] {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const target = isServer ? undefined :
-    frameRef.current?.contentWindow ?? window;
+    frameRef.current?.contentWindow ?? undefined;
 
   return [frameRef, useWindowRadio(target, origin, onMessage)];
 }
