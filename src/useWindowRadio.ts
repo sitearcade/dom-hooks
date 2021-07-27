@@ -21,6 +21,10 @@ export function useWindowRadio<O>(
   onMessage?: OnMessage<O>,
 ) {
   useEffect(() => {
+    if (isServer) {
+      return;
+    }
+
     const handler = (event: MessageEvent) => (
       origin === '*' || event.origin === origin ?
         onMessage?.(event.data, event) : null
