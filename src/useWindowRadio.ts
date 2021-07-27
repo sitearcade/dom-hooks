@@ -1,8 +1,8 @@
 // import
 
-import {isClient, isServer} from '@sitearcade/is-env';
+import {isServer} from '@sitearcade/is-env';
 import type {Ref} from 'react';
-import {useState, useEffect, useCallback} from 'react';
+import {useRef, useEffect, useCallback} from 'react';
 
 // types
 
@@ -45,13 +45,10 @@ export function useFrameRadio<O>(
   origin?: string,
   onMessage?: OnMessage<O>,
 ): [Ref<HTMLIFrameElement>, PostMessage] {
-  const [target, setTarget] = useState<Window | undefined>();
-  const targetRef = useCallback((iframe: HTMLIFrameElement | null) => {
-    if (isClient) {
-      setTarget(iframe?.contentWindow ?? window);
-    }
-  }, []);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const target = isServer ? undefined :
+    frameRef.current?.contentWindow ?? window;
 
-  return [targetRef, useWindowRadio(target, origin, onMessage)];
+  return [frameRef, useWindowRadio(target, origin, onMessage)];
 }
 
