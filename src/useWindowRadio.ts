@@ -17,7 +17,7 @@ const listenerOpts = {capture: false, passive: true};
 
 export function useWindowRadio<O>(
   target?: Window,
-  origin: string = '*',
+  origin: string = '',
   onMessage?: OnMessage<O>,
 ) {
   useEffect(() => {
@@ -42,7 +42,7 @@ export function useWindowRadio<O>(
 }
 
 export function useFrameRadio<O>(
-  origin: string,
+  origin?: string,
   onMessage?: OnMessage<O>,
 ): [Ref<HTMLIFrameElement>, PostMessage] {
   const frameRef = useRef<HTMLIFrameElement>(null);
