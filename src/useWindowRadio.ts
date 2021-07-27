@@ -1,5 +1,6 @@
 // import
 
+import {isServer} from '@sitearcade/is-env';
 import type {Ref} from 'react';
 import {useRef, useEffect, useCallback} from 'react';
 
@@ -15,8 +16,8 @@ const listenerOpts = {capture: false, passive: true};
 // export
 
 export function useWindowRadio<O>(
-  target: Window,
-  origin: string,
+  target?: Window,
+  origin: string = '*',
   onMessage?: OnMessage<O>,
 ) {
   useEffect(() => {
@@ -31,7 +32,7 @@ export function useWindowRadio<O>(
   }, [target, origin, onMessage]);
 
   return useCallback<PostMessage>(
-    (msg) => target.postMessage(msg, origin),
+    (msg) => target?.postMessage(msg, origin),
     [target, origin, onMessage],
   );
 }
@@ -41,7 +42,8 @@ export function useFrameRadio<O>(
   onMessage?: OnMessage<O>,
 ): [Ref<HTMLIFrameElement>, PostMessage] {
   const frameRef = useRef<HTMLIFrameElement>(null);
-  const target = frameRef.current?.contentWindow ?? window;
+  const target = isServer ? undefined :
+    frameRef.current?.contentWindow ?? window;
 
   return [frameRef, useWindowRadio(target, origin, onMessage)];
 }
