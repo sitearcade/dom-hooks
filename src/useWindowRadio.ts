@@ -1,7 +1,7 @@
 // import
 
 import {isServer} from '@sitearcade/is-env';
-import {useRef, useEffect, useCallback} from 'react';
+import {useEffect, useCallback, useState} from 'react';
 
 // types
 
@@ -24,19 +24,20 @@ export function useWindowRadio<O>(
       return;
     }
 
-    const handler = (event: MessageEvent) => (
-      origin === '*' || event.origin === origin ?
-        onMessage?.(event.data, event) : null
-    );
+    const handler = (event: MessageEvent) => {
+      if (origin === '*' || event.origin === origin) {
+        onMessage?.(event.data, event);
+      }
+    };
 
     window.addEventListener('message', handler, listenerOpts);
 
     return () => window.removeEventListener('message', handler);
-  }, [target, origin, onMessage]);
+  }, [origin, onMessage]);
 
   return useCallback<PostMessage>(
     (msg) => target?.postMessage(msg, origin),
-    [target, origin, onMessage],
+    [target, origin],
   );
 }
 
@@ -44,13 +45,11 @@ export function useFrameRadio<O>(
   origin?: string,
   onMessage?: OnMessage<O>,
 ) {
-  const frameRef = useRef<HTMLIFrameElement>(null);
-  const target = isServer ? undefined :
-    frameRef.current?.contentWindow ?? undefined;
+  const [frame, frameRef] = useState<HTMLIFrameElement | null>(null);
+  const target = isServer ? undefined : frame?.contentWindow ?? undefined;
 
   return [
     frameRef,
     useWindowRadio(target, origin, onMessage),
   ] as const;
 }
-
